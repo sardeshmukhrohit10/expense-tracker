@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Make DATE and MONTH picker icons white in dark mode */
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.dark input[type="month"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) hue-rotate(180deg) brightness(3);
+  opacity: 1;
+}
+
+/* Make DATE and MONTH text white */
+.dark input[type="date"],
+.dark input[type="month"] {
+  color: #ffffff;
+}
+
+/* Ensure editable text inside DATE and MONTH inputs is white */
+.dark input[type="date"]::-webkit-datetime-edit,
+.dark input[type="month"]::-webkit-datetime-edit {
+  color: #ffffff;
+}
