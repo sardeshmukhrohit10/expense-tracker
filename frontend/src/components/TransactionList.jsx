@@ -1,7 +1,39 @@
+import { useState, useEffect } from "react";
 import { useTransactions } from "../context/TransactionContext";
+import axios from "axios"; // Make sure axios is installed
 
 export default function TransactionList() {
-  const { filteredTransactions, deleteTransaction } = useTransactions();
+  const { filteredTransactions, setFilteredTransactions, deleteTransaction } = useTransactions();
+  const [loading, setLoading] = useState(true);
+
+  // Fetch transactions from backend on component mount
+  useEffect(() => {
+    async function fetchTransactions() {
+      try {
+        const response = await axios.get("http://localhost:5000/api/transactions");
+        setFilteredTransactions(response.data); // Assuming 'setFilteredTransactions' updates context
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+        setLoading(false);
+      }
+    }
+
+    fetchTransactions();
+  }, [setFilteredTransactions]);
+
+  const handleDeleteTransaction = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/transactions/${id}`);
+      deleteTransaction(id); // Remove from context after successful backend deletion
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+    }
+  };
+
+  if (loading) {
+    return <p>Loading transactions...</p>;
+  }
 
   return (
     <div className="bg-white dark:bg-[#181A20] border border-gray-200/70 dark:border-white/10 rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_0_20px_rgba(255,255,255,0.04)] w-full max-w-5xl p-6 md:p-7">
@@ -41,7 +73,7 @@ export default function TransactionList() {
                   {Math.abs(t.amount).toLocaleString()}
                 </span>
                 <button
-                  onClick={() => deleteTransaction(t.id)}
+                  onClick={() => handleDeleteTransaction(t.id)}
                   className="text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition"
                   aria-label="Delete transaction"
                 >
